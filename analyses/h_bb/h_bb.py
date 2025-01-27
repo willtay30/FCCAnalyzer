@@ -1,11 +1,14 @@
-import functions
-import helpers
+import python.functions as functions
+import python.helpers as helpers
 import ROOT
 import argparse
 import logging
 
-import helper_jetclustering
-import helper_flavourtagger
+# import helper_jetclustering
+# import helper_flavourtagger
+
+from addons.ONNXRuntime.jetFlavourHelper import JetFlavourHelper
+from addons.FastJet.jetClusteringHelper import ExclusiveJetClusteringHelper
 from examples.FCCee.weaver.config import collections, njets
 
 logger = logging.getLogger("fcclogger")
@@ -16,6 +19,64 @@ functions.set_threads(args)
 
 functions.add_include_file("analyses/higgs_mass_xsec/functions.h")
 functions.add_include_file("analyses/higgs_mass_xsec/functions_gen.h")
+# functions.add_include_file("analyses/h_bb/otherfuncs.h")
+# functions.add_include_file("analyses/h_bb/otherfunc_gen.h")
+
+
+# list of all processes
+fraction = 0.05
+processList = {    #Hbb sigs
+    'wzp6_ee_eeH_Hbb_ecm240':          {'fraction':fraction},
+    'wzp6_ee_mumuH_Hbb_ecm240':          {'fraction':fraction},
+    'wzp6_ee_tautauH_Hbb_ecm240':          {'fraction':fraction},
+    'wzp6_ee_nunuH_Hbb_ecm240':          {'fraction':fraction},
+    'wzp6_ee_qqH_Hbb_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ssH_Hbb_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ccH_Hbb_ecm240':          {'fraction':fraction},
+    'wzp6_ee_bbH_Hbb_ecm240':          {'fraction':fraction},
+
+    #Hcc sigs
+    'wzp6_ee_eeH_Hcc_ecm240':          {'fraction':fraction},
+    'wzp6_ee_mumuH_Hcc_ecm240':          {'fraction':fraction},
+    'wzp6_ee_tautauH_Hcc_ecm240':          {'fraction':fraction},
+    'wzp6_ee_nunuH_Hcc_ecm240':          {'fraction':fraction},
+    'wzp6_ee_qqH_Hcc_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ssH_Hcc_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ccH_Hcc_ecm240':          {'fraction':fraction},
+    'wzp6_ee_bbH_Hcc_ecm240':          {'fraction':fraction},
+
+    #Hgg sigs
+    'wzp6_ee_eeH_Hgg_ecm240':          {'fraction':fraction},
+    'wzp6_ee_mumuH_Hgg_ecm240':          {'fraction':fraction},
+    'wzp6_ee_tautauH_Hgg_ecm240':          {'fraction':fraction},
+    'wzp6_ee_nunuH_Hgg_ecm240':          {'fraction':fraction},
+    'wzp6_ee_qqH_Hgg_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ssH_Hgg_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ccH_Hgg_ecm240':          {'fraction':fraction},
+    'wzp6_ee_bbH_Hgg_ecm240':          {'fraction':fraction},
+
+    #bkgs
+    'p8_ee_WW_ecm240':          {'fraction':fraction},
+    'p8_ee_ZZ_ecm240':          {'fraction':fraction},
+    'wzp6_ee_mumu_ecm240':          {'fraction':fraction},
+    'wzp6_ee_tautau_ecm240':          {'fraction':fraction},
+    'wzp6_egamma_eZ_Zmumu_ecm240':          {'fraction':fraction},
+    'wzp6_gammae_eZ_Zmumu_ecm240':          {'fraction':fraction},
+    'wzp6_gaga_mumu_60_ecm240':          {'fraction':fraction},
+    'wzp6_gaga_tautau_60_ecm240':          {'fraction':fraction},
+    'wzp6_ee_nuenueZ_ecm240':          {'fraction':fraction},
+
+}
+
+inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
+procDict = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/samplesDict.json"
+
+# additional/custom C++ functions
+includePaths = ["../higgs_mass_xsec/functions.h", "../higgs_mass_xsec/functions_gen.h", "otherfuncs.h", "otherfunc_gen.h"]
+
+
+# output directory
+outputDir   = "output/hbb_tagging/histmaker/"
 
 
 # define histograms
@@ -52,17 +113,38 @@ bins_pfcand = (200, -10, 10)
 # setup clustering and flavour taggingv helper_jetclustering. helper_flavourtagger.
 # 2 jets
 
-jet2Cluster = helper_jetclustering.ExclusiveJetClusteringHelper(2, "rps_no_leps")
-jet2Flavour = helper_flavourtagger.JetFlavourHelper(collections, jet2Cluster.jets, jet2Cluster.constituents)
+# jet2Cluster = helper_jetclustering.ExclusiveJetClusteringHelper(2, "rps_no_leps")
+# jet2Flavour = helper_flavourtagger.JetFlavourHelper(collections, jet2Cluster.jets, jet2Cluster.constituents)
+
+njets = 2
+jet2Cluster = ExclusiveJetClusteringHelper("rps_no_leps", njets)
+jet2Flavour = JetFlavourHelper(collections, jet2Cluster.jets, jet2Cluster.constituents, "")
+
 # 4 jets
 
-jet4Cluster = helper_jetclustering.ExclusiveJetClusteringHelper(4, "ReconstructedParticles")
-jet4Flavour = helper_flavourtagger.JetFlavourHelper(collections, jet4Cluster.jets, jet4Cluster.constituents)
+# jet4Cluster = helper_jetclustering.ExclusiveJetClusteringHelper(4, "ReconstructedParticles")
+# jet4Flavour = helper_flavourtagger.JetFlavourHelper(collections, jet4Cluster.jets, jet4Cluster.constituents)
 
-path = "/home/submit/aniketkg/FCCAnalyzer_ag/data/flavourtagger/fccee_flavtagging_edm4hep_wc_v1"
-urlpath = "https://fccsw.web.cern.ch/fccsw/testsamples/jet_flavour_tagging/winter2023/wc_pt_13_01_2022/fccee_flavtagging_edm4hep_wc_v1"
-jet2Flavour.load(f"{path}.json", f"{path}.onnx")
-jet4Flavour.load(f"{path}.json", f"{path}.onnx")
+njets = 4
+jet4Cluster = ExclusiveJetClusteringHelper("ReconstructedParticles", njets)
+jet4Flavour = JetFlavourHelper(collections, jet4Cluster.jets, jet4Cluster.constituents, "")
+
+# path = "/home/submit/aniketkg/FCCAnalyzer_ag/data/flavourtagger/fccee_flavtagging_edm4hep_wc_v1"
+# urlpath = "https://fccsw.web.cern.ch/fccsw/testsamples/jet_flavour_tagging/winter2023/wc_pt_13_01_2022/fccee_flavtagging_edm4hep_wc_v1"
+# jet2Flavour.load(f"{path}.json", f"{path}.onnx")
+# jet4Flavour.load(f"{path}.json", f"{path}.onnx")
+
+model_name = "fccee_flavtagging_edm4hep_wc_v1"
+
+# model files needed for unit testing in CI
+url_model_dir = "https://fccsw.web.cern.ch/fccsw/testsamples/jet_flavour_tagging/winter2023/wc_pt_13_01_2022/"
+url_preproc = "{}/{}.json".format(url_model_dir, model_name)
+url_model = "{}/{}.onnx".format(url_model_dir, model_name)
+
+# model files locally stored on /eos
+model_dir = "/eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_13_01_2022/"
+local_preproc = "{}/{}.json".format(model_dir, model_name)
+local_model = "{}/{}.onnx".format(model_dir, model_name)
 
 def get_file_path(url, filename):
     import os
@@ -73,12 +155,12 @@ def get_file_path(url, filename):
         urllib.request.urlretrieve(url, os.path.basename(url))
         return os.path.basename(url)
 
-weaver_preproc = get_file_path("{}.json".format(urlpath), "{}.json".format(path))
-weaver_model = get_file_path("{}.onnx".format(urlpath), "{}.onnx".format(path))
+weaver_preproc = get_file_path(url_preproc, local_preproc)
+weaver_model = get_file_path(url_model, local_model)
 
 def build_graph(df, dataset):
 
-    logging.info(f"build graph {dataset.name}")
+    #logging.info(f"build graph {dataset.name}")
     results, cols = [], []
 
     df = df.Define("weight", "1.0")
@@ -268,8 +350,9 @@ def build_graph(df, dataset):
         
         # clustering
         df = jet2Cluster.define(df)
-        df = df.Define("jet_tlv", "FCCAnalyses::makeLorentzVectors(jet_px, jet_py, jet_pz, jet_e)")
-        
+        #df = df.Define("jet_tlv", "FCCAnalyses::makeLorentzVectors(jet_px, jet_py, jet_pz, jet_e)")
+        df = df.Define("jet_tlv", f"JetConstituentsUtils::compute_tlv_jets({jet2Cluster.jets})")
+
         # calculate dijet m and p
         df = df.Define("dijet", "jet_tlv[0] + jet_tlv[1]")
         df = df.Define("dijet_m", "dijet.M()")
@@ -288,7 +371,9 @@ def build_graph(df, dataset):
         
         # flavour tagging
 
-        df = jet2Flavour.define_and_inference(df)
+        #df = jet2Flavour.define_and_inference(df)
+        df = jet2Flavour.define(df) # define variables
+        df = jet2Flavour.inference(weaver_preproc, weaver_model, df) # run inference
         
         # cut on b jet confidence
         df = df.Filter("recojet_isB[0] > 0.5 && recojet_isB[1] > 0.5")
@@ -306,163 +391,166 @@ def build_graph(df, dataset):
         results.append(df.Histo1D((f"z{leps}_h_p", "", *bins_m), "dijet_p"))
 
 
-    if False:
-        # jet analysis for the case of 2 jets (Z -> leps)
-        
+
+    # jet analysis for the case of 2 jets (Z -> leps)
 
 
 
-        # Z->qq analyses
-        # clustering
-        df_quarks = jet4Cluster.define(df_quarks)
-        df_quarks = df_quarks.Define("jet_tlv", "FCCAnalyses::makeLorentzVectors(jet_px, jet_py, jet_pz, jet_e)")
+    # Z->qq analyses
+    # clustering
+    df_quarks = jet4Cluster.define(df_quarks)
+    #df_quarks = df_quarks.Define("jet_tlv", "FCCAnalyses::makeLorentzVectors(jet_px, jet_py, jet_pz, jet_e)")
+    df_quarks = df_quarks.Define("jet_tlv", f"JetConstituentsUtils::compute_tlv_jets({jet4Cluster.jets})")
 
-        # pair jets based on distance to Z and H masses
-        df_quarks = df_quarks.Define("zh_min_idx", """
-                FCCAnalyses::Vec_i min{0, 0, 0, 0};
-                float distm = INFINITY;
-                for (int i = 0; i < 3; i++)
-                    for (int j = i + 1; j < 4; j++)
-                        for (int k = 0; k < 3; k++) {
-                            if (i == k || j == k) continue;
-                            for (int l = k + 1; l < 4; l++) {
-                                if (i == l || j == l) continue;
-                                float distz = (jet_tlv[i] + jet_tlv[j]).M() - 91.2;
-                                float disth = (jet_tlv[k] + jet_tlv[l]).M() - 125;
-                                if (distz*distz/91.2 + disth*disth/125 < distm) {
-                                    distm = distz*distz/91.2 + disth*disth/125;
-                                    min[0] = i; min[1] = j; min[2] = k; min[3] = l;
-                                }
+    # pair jets based on distance to Z and H masses
+    df_quarks = df_quarks.Define("zh_min_idx", """
+            FCCAnalyses::Vec_i min{0, 0, 0, 0};
+            float distm = INFINITY;
+            for (int i = 0; i < 3; i++)
+                for (int j = i + 1; j < 4; j++)
+                    for (int k = 0; k < 3; k++) {
+                        if (i == k || j == k) continue;
+                        for (int l = k + 1; l < 4; l++) {
+                            if (i == l || j == l) continue;
+                            float distz = (jet_tlv[i] + jet_tlv[j]).M() - 91.2;
+                            float disth = (jet_tlv[k] + jet_tlv[l]).M() - 125;
+                            if (distz*distz/91.2 + disth*disth/125 < distm) {
+                                distm = distz*distz/91.2 + disth*disth/125;
+                                min[0] = i; min[1] = j; min[2] = k; min[3] = l;
                             }
                         }
-                return min;""")
+                    }
+            return min;""")
 
-        # compute Z and H masses and momenta
-        df_quarks = df_quarks.Define("z_dijet", "jet_tlv[zh_min_idx[0]] + jet_tlv[zh_min_idx[1]]")
-        df_quarks = df_quarks.Define("h_dijet", "jet_tlv[zh_min_idx[2]] + jet_tlv[zh_min_idx[3]]")
+    # compute Z and H masses and momenta
+    df_quarks = df_quarks.Define("z_dijet", "jet_tlv[zh_min_idx[0]] + jet_tlv[zh_min_idx[1]]")
+    df_quarks = df_quarks.Define("h_dijet", "jet_tlv[zh_min_idx[2]] + jet_tlv[zh_min_idx[3]]")
 
-        df_quarks = df_quarks.Define("z_dijet_m", "z_dijet.M()")
-        df_quarks = df_quarks.Define("z_dijet_p", "z_dijet.P()")
-        df_quarks = df_quarks.Define("h_dijet_m", "h_dijet.M()")
-        df_quarks = df_quarks.Define("h_dijet_p", "h_dijet.P()")
+    df_quarks = df_quarks.Define("z_dijet_m", "z_dijet.M()")
+    df_quarks = df_quarks.Define("z_dijet_p", "z_dijet.P()")
+    df_quarks = df_quarks.Define("h_dijet_m", "h_dijet.M()")
+    df_quarks = df_quarks.Define("h_dijet_p", "h_dijet.P()")
 
-        results.append(df_quarks.Histo1D(("quarks_z_m_nOne", "", *bins_m), "z_dijet_m"))
-        results.append(df_quarks.Histo1D(("quarks_z_p_nOne", "", *bins_m), "z_dijet_p"))
-        results.append(df_quarks.Histo1D(("quarks_h_m_nOne", "", *bins_m), "h_dijet_m"))
-        results.append(df_quarks.Histo1D(("quarks_h_p_nOne", "", *bins_m), "h_dijet_p"))
+    results.append(df_quarks.Histo1D(("quarks_z_m_nOne", "", *bins_m), "z_dijet_m"))
+    results.append(df_quarks.Histo1D(("quarks_z_p_nOne", "", *bins_m), "z_dijet_p"))
+    results.append(df_quarks.Histo1D(("quarks_h_m_nOne", "", *bins_m), "h_dijet_m"))
+    results.append(df_quarks.Histo1D(("quarks_h_p_nOne", "", *bins_m), "h_dijet_p"))
 
-        # filter on Z momentum
-        df_quarks = df_quarks.Filter("z_dijet_p > 45 && z_dijet_p < 56")
-        results.append(df_quarks.Histo1D(("cutFlow_bb", "", *bins_count), "cut2"))
-        results.append(df_quarks.Histo1D(("cutFlow_cc", "", *bins_count), "cut2"))
-        results.append(df_quarks.Histo1D(("cutFlow_ss", "", *bins_count), "cut2"))
-        results.append(df_quarks.Histo1D(("cutFlow_qq", "", *bins_count), "cut2"))
+    # filter on Z momentum
+    df_quarks = df_quarks.Filter("z_dijet_p > 45 && z_dijet_p < 56")
+    results.append(df_quarks.Histo1D(("cutFlow_bb", "", *bins_count), "cut2"))
+    results.append(df_quarks.Histo1D(("cutFlow_cc", "", *bins_count), "cut2"))
+    results.append(df_quarks.Histo1D(("cutFlow_ss", "", *bins_count), "cut2"))
+    results.append(df_quarks.Histo1D(("cutFlow_qq", "", *bins_count), "cut2"))
 
-        # filter on H mass
-        df_quarks = df_quarks.Filter("h_dijet_m > 122 && h_dijet_m < 128")
-        results.append(df_quarks.Histo1D(("cutFlow_bb", "", *bins_count), "cut3"))
-        results.append(df_quarks.Histo1D(("cutFlow_cc", "", *bins_count), "cut3"))
-        results.append(df_quarks.Histo1D(("cutFlow_ss", "", *bins_count), "cut3"))
-        results.append(df_quarks.Histo1D(("cutFlow_qq", "", *bins_count), "cut3"))
+    # filter on H mass
+    df_quarks = df_quarks.Filter("h_dijet_m > 122 && h_dijet_m < 128")
+    results.append(df_quarks.Histo1D(("cutFlow_bb", "", *bins_count), "cut3"))
+    results.append(df_quarks.Histo1D(("cutFlow_cc", "", *bins_count), "cut3"))
+    results.append(df_quarks.Histo1D(("cutFlow_ss", "", *bins_count), "cut3"))
+    results.append(df_quarks.Histo1D(("cutFlow_qq", "", *bins_count), "cut3"))
 
 
-        # flavour tagging
-        df_quarks = jet4Flavour.define_and_inference(df_quarks)
+    # flavour tagging
+    #df_quarks = jet4Flavour.define_and_inference(df_quarks)
+    df_quarks = jet4Flavour.define(df_quarks) # define variables
+    df_quarks = jet4Flavour.inference(weaver_preproc, weaver_model, df_quarks) # run inference
 
-        # get tag confidence
-        df_quarks = df_quarks.Define("Hbb_prob", "std::min(recojet_isB[zh_min_idx[2]], recojet_isB[zh_min_idx[3]])")
-        results.append(df_quarks.Histo1D(("Hbb_prob_nOne", "", *bins_prob), "Hbb_prob"))
 
-        df_quarks = df_quarks.Define("Zbb_prob", "std::min(recojet_isB[zh_min_idx[0]], recojet_isB[zh_min_idx[1]])")
-        df_quarks = df_quarks.Define("Zcc_prob", "std::min(recojet_isC[zh_min_idx[0]], recojet_isC[zh_min_idx[1]])")
-        df_quarks = df_quarks.Define("Zss_prob", "std::min(recojet_isS[zh_min_idx[0]], recojet_isS[zh_min_idx[1]])")
-        df_quarks = df_quarks.Define("Zqq_prob", "std::min(recojet_isQ[zh_min_idx[0]], recojet_isQ[zh_min_idx[1]])")
+    # get tag confidence
+    df_quarks = df_quarks.Define("Hbb_prob", "std::min(recojet_isB[zh_min_idx[2]], recojet_isB[zh_min_idx[3]])")
+    results.append(df_quarks.Histo1D(("Hbb_prob_nOne", "", *bins_prob), "Hbb_prob"))
 
-        results.append(df_quarks.Histo1D(("Zbb_prob_nOne", "", *bins_prob), "Zbb_prob"))
-        results.append(df_quarks.Histo1D(("Zcc_prob_nOne", "", *bins_prob), "Zcc_prob"))
-        results.append(df_quarks.Histo1D(("Zss_prob_nOne", "", *bins_prob), "Zss_prob"))
-        results.append(df_quarks.Histo1D(("Zqq_prob_nOne", "", *bins_prob), "Zqq_prob"))
+    df_quarks = df_quarks.Define("Zbb_prob", "std::min(recojet_isB[zh_min_idx[0]], recojet_isB[zh_min_idx[1]])")
+    df_quarks = df_quarks.Define("Zcc_prob", "std::min(recojet_isC[zh_min_idx[0]], recojet_isC[zh_min_idx[1]])")
+    df_quarks = df_quarks.Define("Zss_prob", "std::min(recojet_isS[zh_min_idx[0]], recojet_isS[zh_min_idx[1]])")
+    df_quarks = df_quarks.Define("Zqq_prob", "std::min(recojet_isQ[zh_min_idx[0]], recojet_isQ[zh_min_idx[1]])")
 
-        # sort by most likely tag
-        df_quarks = df_quarks.Define("Zbb_like", "recojet_isB[zh_min_idx[0]] + recojet_isB[zh_min_idx[1]]")
-        df_quarks = df_quarks.Define("Zcc_like", "recojet_isC[zh_min_idx[0]] + recojet_isC[zh_min_idx[1]]")
-        df_quarks = df_quarks.Define("Zss_like", "recojet_isS[zh_min_idx[0]] + recojet_isS[zh_min_idx[1]]")
-        df_quarks = df_quarks.Define("Zqq_like", "recojet_isQ[zh_min_idx[0]] + recojet_isQ[zh_min_idx[1]]")
+    results.append(df_quarks.Histo1D(("Zbb_prob_nOne", "", *bins_prob), "Zbb_prob"))
+    results.append(df_quarks.Histo1D(("Zcc_prob_nOne", "", *bins_prob), "Zcc_prob"))
+    results.append(df_quarks.Histo1D(("Zss_prob_nOne", "", *bins_prob), "Zss_prob"))
+    results.append(df_quarks.Histo1D(("Zqq_prob_nOne", "", *bins_prob), "Zqq_prob"))
 
-        df_quarks = df_quarks.Define("best_tag", """
-                if (Zbb_like > Zcc_like && Zbb_like > Zss_like && Zbb_like > Zqq_like) {
-                    return 0;
-                } else if (Zcc_like > Zss_like && Zcc_like > Zqq_like) {
-                    return 1;
-                } else if (Zss_like > Zqq_like) {
-                    return 2;
-                } else {
-                    return 3;
-                } """)
+    # sort by most likely tag
+    df_quarks = df_quarks.Define("Zbb_like", "recojet_isB[zh_min_idx[0]] + recojet_isB[zh_min_idx[1]]")
+    df_quarks = df_quarks.Define("Zcc_like", "recojet_isC[zh_min_idx[0]] + recojet_isC[zh_min_idx[1]]")
+    df_quarks = df_quarks.Define("Zss_like", "recojet_isS[zh_min_idx[0]] + recojet_isS[zh_min_idx[1]]")
+    df_quarks = df_quarks.Define("Zqq_like", "recojet_isQ[zh_min_idx[0]] + recojet_isQ[zh_min_idx[1]]")
 
-        # sort by maximum likelihood tag
-        df_bb = df_quarks.Filter("best_tag == 0")
-        df_cc = df_quarks.Filter("best_tag == 1")
-        df_ss = df_quarks.Filter("best_tag == 2")
-        df_qq = df_quarks.Filter("best_tag == 3")
+    df_quarks = df_quarks.Define("best_tag", """
+            if (Zbb_like > Zcc_like && Zbb_like > Zss_like && Zbb_like > Zqq_like) {
+                return 0;
+            } else if (Zcc_like > Zss_like && Zcc_like > Zqq_like) {
+                return 1;
+            } else if (Zss_like > Zqq_like) {
+                return 2;
+            } else {
+                return 3;
+            } """)
 
-        results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut4"))
-        results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut4"))
-        results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut4"))
-        results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut4"))
+    # sort by maximum likelihood tag
+    df_bb = df_quarks.Filter("best_tag == 0")
+    df_cc = df_quarks.Filter("best_tag == 1")
+    df_ss = df_quarks.Filter("best_tag == 2")
+    df_qq = df_quarks.Filter("best_tag == 3")
 
-        results.append(df_bb.Graph("Hbb_prob", "Zbb_prob"))
-        results.append(df_cc.Graph("Hbb_prob", "Zcc_prob"))
-        results.append(df_ss.Graph("Hbb_prob", "Zss_prob"))
-        results.append(df_qq.Graph("Hbb_prob", "Zqq_prob"))
+    results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut4"))
+    results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut4"))
+    results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut4"))
+    results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut4"))
 
-        # make sure there are two b jets
-        df_qq = df_qq.Filter("Hbb_prob > 0.032")
-        df_ss = df_ss.Filter("Hbb_prob > 0.032")
-        df_cc = df_cc.Filter("Hbb_prob > 0.029")
-        df_bb = df_bb.Filter("Hbb_prob > 0.011")
+    results.append(df_bb.Graph("Hbb_prob", "Zbb_prob"))
+    results.append(df_cc.Graph("Hbb_prob", "Zcc_prob"))
+    results.append(df_ss.Graph("Hbb_prob", "Zss_prob"))
+    results.append(df_qq.Graph("Hbb_prob", "Zqq_prob"))
 
-        results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut5"))
-        results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut5"))
-        results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut5"))
-        results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut5"))
+    # make sure there are two b jets
+    df_qq = df_qq.Filter("Hbb_prob > 0.032")
+    df_ss = df_ss.Filter("Hbb_prob > 0.032")
+    df_cc = df_cc.Filter("Hbb_prob > 0.029")
+    df_bb = df_bb.Filter("Hbb_prob > 0.011")
 
-        # check that the Z jets are the right type
-        df_bb = df_bb.Filter("Zbb_prob > 0.042")
-        df_cc = df_cc.Filter("Zcc_prob > 0.134")
-        df_ss = df_ss.Filter("Zss_prob > 0.095")
-        df_qq = df_qq.Filter("Zqq_prob > 0.053")
+    results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut5"))
+    results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut5"))
+    results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut5"))
+    results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut5"))
 
-        results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut6"))
-        results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut6"))
-        results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut6"))
-        results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut6"))
+    # check that the Z jets are the right type
+    df_bb = df_bb.Filter("Zbb_prob > 0.042")
+    df_cc = df_cc.Filter("Zcc_prob > 0.134")
+    df_ss = df_ss.Filter("Zss_prob > 0.095")
+    df_qq = df_qq.Filter("Zqq_prob > 0.053")
 
-        # make final mass and momentum histograms
-        for q, df in [("bb", df_bb), ("cc", df_cc), ("ss", df_ss), ("qq", df_qq)]:
-            results.append(df.Histo1D((f"z{q}_z_m", "", *bins_m), "z_dijet_m"))
-            results.append(df.Histo1D((f"z{q}_h_m", "", *bins_m), "h_dijet_m"))
-            results.append(df.Histo1D((f"z{q}_z_p", "", *bins_m), "z_dijet_p"))
-            results.append(df.Histo1D((f"z{q}_h_p", "", *bins_m), "h_dijet_p"))
+    results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut6"))
+    results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut6"))
+    results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut6"))
+    results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut6"))
+
+    # make final mass and momentum histograms
+    for q, df in [("bb", df_bb), ("cc", df_cc), ("ss", df_ss), ("qq", df_qq)]:
+        results.append(df.Histo1D((f"z{q}_z_m", "", *bins_m), "z_dijet_m"))
+        results.append(df.Histo1D((f"z{q}_h_m", "", *bins_m), "h_dijet_m"))
+        results.append(df.Histo1D((f"z{q}_z_p", "", *bins_m), "z_dijet_p"))
+        results.append(df.Histo1D((f"z{q}_h_p", "", *bins_m), "h_dijet_p"))
 
 
     
     return results, weightsum
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    datadict = functions.get_datadicts() # get default datasets
+#     datadict = functions.get_datadicts() # get default datasets
 
-    Zprods = ["ee", "mumu", "tautau", "nunu", "qq", "ss", "cc", "bb"] 
-    bb_sig = [f"wzp6_ee_{i}H_Hbb_ecm240" for i in Zprods]
-    cc_sig = [f"wzp6_ee_{i}H_Hcc_ecm240" for i in Zprods]
-    gg_sig = [f"wzp6_ee_{i}H_Hgg_ecm240" for i in Zprods]
+#     Zprods = ["ee", "mumu", "tautau", "nunu", "qq", "ss", "cc", "bb"] 
+#     bb_sig = [f"wzp6_ee_{i}H_Hbb_ecm240" for i in Zprods]
+#     cc_sig = [f"wzp6_ee_{i}H_Hcc_ecm240" for i in Zprods]
+#     gg_sig = [f"wzp6_ee_{i}H_Hgg_ecm240" for i in Zprods]
     
-    quark_test = ["wzp6_ee_qqH_Hbb_ecm240", "wzp6_ee_ssH_Hbb_ecm240", "wzp6_ee_ccH_Hbb_ecm240", "wzp6_ee_bbH_Hbb_ecm240"]
+#     quark_test = ["wzp6_ee_qqH_Hbb_ecm240", "wzp6_ee_ssH_Hbb_ecm240", "wzp6_ee_ccH_Hbb_ecm240", "wzp6_ee_bbH_Hbb_ecm240"]
     
-    datasets_bkg = ["p8_ee_WW_ecm240", "p8_ee_ZZ_ecm240", "wzp6_ee_mumu_ecm240", "wzp6_ee_tautau_ecm240", "wzp6_egamma_eZ_Zmumu_ecm240", "wzp6_gammae_eZ_Zmumu_ecm240", "wzp6_gaga_mumu_60_ecm240", "wzp6_gaga_tautau_60_ecm240", "wzp6_ee_nuenueZ_ecm240"]
+#     datasets_bkg = ["p8_ee_WW_ecm240", "p8_ee_ZZ_ecm240", "wzp6_ee_mumu_ecm240", "wzp6_ee_tautau_ecm240", "wzp6_egamma_eZ_Zmumu_ecm240", "wzp6_gammae_eZ_Zmumu_ecm240", "wzp6_gaga_mumu_60_ecm240", "wzp6_gaga_tautau_60_ecm240", "wzp6_ee_nuenueZ_ecm240"]
 
-    datasets_to_run = bb_sig + cc_sig + gg_sig + datasets_bkg[:2]
+#     datasets_to_run = bb_sig + cc_sig + gg_sig + datasets_bkg[:2]
     
-    result = functions.build_and_run(datadict, datasets_to_run, build_graph, f"end_of_h_bb.root", args, norm=True, lumi=7200000)
+#     result = functions.build_and_run(datadict, datasets_to_run, build_graph, f"end_of_h_bb.root", args, norm=True, lumi=7200000)
