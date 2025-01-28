@@ -1,4 +1,4 @@
-import python.functions as functions
+# import python.functions as functions      # must be commented out for running fccanalyis
 import python.helpers as helpers
 import ROOT
 import argparse
@@ -11,14 +11,22 @@ from addons.ONNXRuntime.jetFlavourHelper import JetFlavourHelper
 from addons.FastJet.jetClusteringHelper import ExclusiveJetClusteringHelper
 from examples.FCCee.weaver.config import collections, njets
 
+#***************************************************
+# Notice:
+# -Currently only the use of fccanalysis run [] (with proper sourcing) works
+# -Much of the code is commented to allow for further testing, file may not work when uncommented
+# -Code takes a long time to run to completion (>1hr)
+# -Output is stored as seperate root files @ output/hbb_tagging/
+#****************************************************
+
 logger = logging.getLogger("fcclogger")
 
-parser = functions.make_def_argparser()
-args = parser.parse_args()
-functions.set_threads(args)
+# parser = functions.make_def_argparser()
+# args = parser.parse_args()
+# functions.set_threads(args)
 
-functions.add_include_file("analyses/higgs_mass_xsec/functions.h")
-functions.add_include_file("analyses/higgs_mass_xsec/functions_gen.h")
+# functions.add_include_file("analyses/higgs_mass_xsec/functions.h")
+# functions.add_include_file("analyses/higgs_mass_xsec/functions_gen.h")
 # functions.add_include_file("analyses/h_bb/otherfuncs.h")
 # functions.add_include_file("analyses/h_bb/otherfunc_gen.h")
 
@@ -537,6 +545,8 @@ def build_graph(df, dataset):
     
     return results, weightsum
 
+
+# Main function must be uncommented when running file using python, else keep commented
 
 # if __name__ == "__main__":
 
