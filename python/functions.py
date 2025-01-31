@@ -3,13 +3,13 @@ import sys, os, glob, shutil, json, math, re, random
 import concurrent.futures
 import time
 import ROOT
-from dataset import Dataset
+from python.dataset import Dataset
 import argparse
 import pathlib
 import json
 import logging
 import pickle
-import submit
+import python.submit as submit
 
 logging.basicConfig(format='%(levelname)s: %(message)s')
 logger = logging.getLogger("fcclogger")
@@ -241,8 +241,9 @@ def build_and_run(datadict, datasets_to_run, build_function, output_file, args, 
         if not datasetName in datadict:
             logger.warning(f"dataset {datasetName} does not exist, skipping")
             continue
-        xsec = datadict[datasetName]['xsec']
-        path = f"{datadict['basePath']}/{datadict[datasetName]['path']}"
+        xsec = datadict[datasetName]['crossSection']
+        #path = f"{datadict['basePath']}/{datadict[datasetName]['path']}"
+        path = f"{datadict[datasetName]['path']}"
         if not os.path.exists(path):
             logger.warning(f"directory {path} does not exist, skipping")
             continue
@@ -494,10 +495,15 @@ def get_datadicts(campaign="winter2023"):
     basedirs['mit'] = "/ceph/submit/data/group/cms/store/fccee/samples/"
     basedirs['fcc_eos'] = "/eos/experiment/fcc/ee/generation/DelphesEvents/"
 
+    basedirs['other'] = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents"
+
     hostname = get_hostname()
-    if "mit.edu" in hostname: basedir = basedirs['mit']
-    else: basedir = ""
-    catalog = f'{basedir}/{campaign}/catalog.json'
+    #if "mit.edu" in hostname: basedir = basedirs['mit']
+    #else: basedir = ""
+    basedir = basedirs['other']
+
+    #catalog = f'{basedir}/{campaign}/catalog.json'
+    catalog = f'{basedir}/{campaign}/IDEA/samplesDict.json'
     f = open(catalog)
     datadict = json.load(f)
     datadict['basePath'] = os.path.dirname(catalog)
