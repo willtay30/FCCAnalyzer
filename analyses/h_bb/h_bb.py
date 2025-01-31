@@ -27,8 +27,7 @@ logger = logging.getLogger("fcclogger")
 
 # functions.add_include_file("analyses/higgs_mass_xsec/functions.h")
 # functions.add_include_file("analyses/higgs_mass_xsec/functions_gen.h")
-# functions.add_include_file("analyses/h_bb/otherfuncs.h")
-# functions.add_include_file("analyses/h_bb/otherfunc_gen.h")
+
 
 
 # list of all processes
