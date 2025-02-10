@@ -30,8 +30,8 @@ class Dataset:
         else:
             f = open(fName)
             d = json.load(f)
-            self.total_files = d['total_files']
-            self.total_events = d['total_events']
+            self.total_files = d['numberOfFiles']
+            self.total_events = d['numberOfEvents']
         self.nevents_per_file = self.total_events / self.total_files
 
     def findROOTFiles(self, basedir, regex = ""):
