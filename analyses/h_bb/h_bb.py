@@ -19,6 +19,8 @@ from examples.FCCee.weaver.config import collections, njets
 # -Output is stored as seperate root files @ output/hbb_tagging/
 #****************************************************
 
+#modifying names 
+
 logger = logging.getLogger("fcclogger")
 runBatch = True
 nCPUS= -1
@@ -29,6 +31,7 @@ nCPUS= -1
 # functions.add_include_file("analyses/higgs_mass_xsec/functions.h")
 # functions.add_include_file("analyses/higgs_mass_xsec/functions_gen.h")
 
+flavour = "C"  # Change to B or C or S as needed
 
 # list of all processes
 fraction = 0.005
@@ -83,7 +86,7 @@ includePaths = ["../higgs_mass_xsec/functions.h", "../higgs_mass_xsec/functions_
 
 
 # output directory
-outputDir   = "output/hbb_tagging/histmaker/"
+outputDir   = f"output2/h{flavour}{flavour}_tagging/histmaker/"
 
 
 # define histograms
@@ -312,6 +315,10 @@ def build_graph(df, dataset):
     ### CUT 3: recoil cut (H mass)
     #########
     results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne", "", *bins_m), "zmumu_recoil_m"))
+    #make a histogram that plots what's in zmumu_recoil. make another histogram right after the filter
+    #do that for all cuts
+    #look thru histograms for each cut
+    #make slides: signal before and after each cut (ZH->mumucc)
     df_mumu = df_mumu.Filter("zmumu_recoil_m > 123 && zmumu_recoil_m < 132")
     results.append(df_mumu.Histo1D(("cutFlow_mumu", "", *bins_count), "cut3"))
     results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne_after", "", *bins_m), "zmumu_recoil_m"))
@@ -383,8 +390,9 @@ def build_graph(df, dataset):
         df = jet2Flavour.define(df) # define variables
         df = jet2Flavour.inference(weaver_preproc, weaver_model, df) # run inference
         
-        # cut on b jet confidence
-        df = df.Filter("recojet_isB[0] > 0.5 && recojet_isB[1] > 0.5") # add flavour variable
+        # cut on jet confidence
+        #LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOK HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        df = df.Filter(f"recojet_is{flavour}[0] > 0.5 && recojet_is{flavour}[1] > 0.5")
         
         if leps != "neutrinos":
             results.append(df.Histo1D((f"cutFlow_{'mumu' if leps == 'muons' else 'ee'}", "", *bins_count), "cut6"))
@@ -400,7 +408,7 @@ def build_graph(df, dataset):
 
 
 
-    # jet analysis for the case of 2 jets (Z -> leps)
+    # jet analysis for the case of 2 jets (Z -> leps) --------------
 
 
 
@@ -466,8 +474,8 @@ def build_graph(df, dataset):
 
 
     # get tag confidence
-    df_quarks = df_quarks.Define("Hbb_prob", "std::min(recojet_isB[zh_min_idx[2]], recojet_isB[zh_min_idx[3]])")
-    results.append(df_quarks.Histo1D(("Hbb_prob_nOne", "", *bins_prob), "Hbb_prob"))
+    df_quarks = df_quarks.Define(f"H{flavour}{flavour}_prob", f"std::min(recojet_is{flavour}[zh_min_idx[2]], recojet_is{flavour}[zh_min_idx[3]])")
+    results.append(df_quarks.Histo1D((f"H{flavour}{flavour}_prob_nOne", "", *bins_prob), f"H{flavour}{flavour}_prob"))
 
     df_quarks = df_quarks.Define("Zbb_prob", "std::min(recojet_isB[zh_min_idx[0]], recojet_isB[zh_min_idx[1]])")
     df_quarks = df_quarks.Define("Zcc_prob", "std::min(recojet_isC[zh_min_idx[0]], recojet_isC[zh_min_idx[1]])")
@@ -507,16 +515,19 @@ def build_graph(df, dataset):
     results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut4"))
     results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut4"))
 
-    results.append(df_bb.Graph("Hbb_prob", "Zbb_prob"))
-    results.append(df_cc.Graph("Hbb_prob", "Zcc_prob"))
-    results.append(df_ss.Graph("Hbb_prob", "Zss_prob"))
-    results.append(df_qq.Graph("Hbb_prob", "Zqq_prob"))
+    results.append(df_bb.Graph(f"H{flavour}{flavour}_prob", "Zbb_prob"))
+    results.append(df_cc.Graph(f"H{flavour}{flavour}_prob", "Zcc_prob"))
+    results.append(df_ss.Graph(f"H{flavour}{flavour}_prob", "Zss_prob"))
+    results.append(df_qq.Graph(f"H{flavour}{flavour}_prob", "Zqq_prob"))
 
-    # make sure there are two b jets
-    df_qq = df_qq.Filter("Hbb_prob > 0.032")
-    df_ss = df_ss.Filter("Hbb_prob > 0.032")
-    df_cc = df_cc.Filter("Hbb_prob > 0.029")
-    df_bb = df_bb.Filter("Hbb_prob > 0.011")
+    # make sure there are two b (or c or s) jets
+    # switch case based on flavour so that you don't have to change the probabilities each time you change flavour
+    # 16 possibilities
+    # probabilities obtained thru optimization
+    df_qq = df_qq.Filter(f"H{flavour}{flavour}_prob > 0.032") #bb: .032
+    df_ss = df_ss.Filter(f"H{flavour}{flavour}_prob > 0.032") #bb: .032
+    df_cc = df_cc.Filter(f"H{flavour}{flavour}_prob > 0.029") #bb: .029
+    df_bb = df_bb.Filter(f"H{flavour}{flavour}_prob > 0.011") #bb: .011
 
     results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut5"))
     results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut5"))
