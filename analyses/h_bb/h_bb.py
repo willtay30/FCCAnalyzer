@@ -20,7 +20,8 @@ from examples.FCCee.weaver.config import collections, njets
 #****************************************************
 
 logger = logging.getLogger("fcclogger")
-
+runBatch = True
+nCPUS= -1
 # parser = functions.make_def_argparser()
 # args = parser.parse_args()
 # functions.set_threads(args)
@@ -29,9 +30,8 @@ logger = logging.getLogger("fcclogger")
 # functions.add_include_file("analyses/higgs_mass_xsec/functions_gen.h")
 
 
-
 # list of all processes
-fraction = 0.05
+fraction = 0.005
 processList = {    #Hbb sigs
     'wzp6_ee_eeH_Hbb_ecm240':          {'fraction':fraction},
     'wzp6_ee_mumuH_Hbb_ecm240':          {'fraction':fraction},
@@ -314,6 +314,7 @@ def build_graph(df, dataset):
     results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne", "", *bins_m), "zmumu_recoil_m"))
     df_mumu = df_mumu.Filter("zmumu_recoil_m > 123 && zmumu_recoil_m < 132")
     results.append(df_mumu.Histo1D(("cutFlow_mumu", "", *bins_count), "cut3"))
+    results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne_after", "", *bins_m), "zmumu_recoil_m"))
     
     results.append(df_ee.Histo1D(("ee_recoil_m_nOne", "", *bins_m), "zee_recoil_m"))
     df_ee = df_ee.Filter("zee_recoil_m > 123 && zee_recoil_m < 132")
@@ -383,7 +384,7 @@ def build_graph(df, dataset):
         df = jet2Flavour.inference(weaver_preproc, weaver_model, df) # run inference
         
         # cut on b jet confidence
-        df = df.Filter("recojet_isB[0] > 0.5 && recojet_isB[1] > 0.5")
+        df = df.Filter("recojet_isB[0] > 0.5 && recojet_isB[1] > 0.5") # add flavour variable
         
         if leps != "neutrinos":
             results.append(df.Histo1D((f"cutFlow_{'mumu' if leps == 'muons' else 'ee'}", "", *bins_count), "cut6"))
