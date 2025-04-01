@@ -22,7 +22,8 @@ from examples.FCCee.weaver.config import collections, njets
 #modifying names 
 
 logger = logging.getLogger("fcclogger")
-
+runBatch = True
+nCPUS= -1
 # parser = functions.make_def_argparser()
 # args = parser.parse_args()
 # functions.set_threads(args)
@@ -34,8 +35,6 @@ flavour = "C"  # Change to B or C or S as needed
 
 # list of all processes
 fraction = 0.005
-#try commenting out all except target signal to run faster
-
 processList = {    #Hbb sigs
     'wzp6_ee_eeH_Hbb_ecm240':          {'fraction':fraction},
     'wzp6_ee_mumuH_Hbb_ecm240':          {'fraction':fraction},
@@ -330,6 +329,7 @@ def build_graph(df, dataset):
     df_mumu = df_mumu.Filter("zmumu_recoil_m > 123 && zmumu_recoil_m < 132")
     results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne_afterFilter", "", *bins_m), "zmumu_recoil_m")) ###########
     results.append(df_mumu.Histo1D(("cutFlow_mumu", "", *bins_count), "cut3"))
+    results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne_after", "", *bins_m), "zmumu_recoil_m"))
     
     results.append(df_ee.Histo1D(("ee_recoil_m_nOne", "", *bins_m), "zee_recoil_m"))
     df_ee = df_ee.Filter("zee_recoil_m > 123 && zee_recoil_m < 132")
