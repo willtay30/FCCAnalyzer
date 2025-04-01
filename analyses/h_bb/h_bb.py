@@ -33,7 +33,9 @@ logger = logging.getLogger("fcclogger")
 flavour = "C"  # Change to B or C or S as needed
 
 # list of all processes
-fraction = 0.05
+fraction = 0.005
+#try commenting out all except target signal to run faster
+
 processList = {    #Hbb sigs
     'wzp6_ee_eeH_Hbb_ecm240':          {'fraction':fraction},
     'wzp6_ee_mumuH_Hbb_ecm240':          {'fraction':fraction},
@@ -64,6 +66,16 @@ processList = {    #Hbb sigs
     'wzp6_ee_ccH_Hgg_ecm240':          {'fraction':fraction},
     'wzp6_ee_bbH_Hgg_ecm240':          {'fraction':fraction},
 
+    #Hss sigs # ADDED (not in original code for some reason)
+    'wzp6_ee_eeH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_mumuH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_tautauH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_nunuH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_qqH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ssH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ccH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_bbH_Hss_ecm240':          {'fraction':fraction},
+
     #bkgs
     'p8_ee_WW_ecm240':          {'fraction':fraction},
     'p8_ee_ZZ_ecm240':          {'fraction':fraction},
@@ -85,11 +97,12 @@ includePaths = ["../higgs_mass_xsec/functions.h", "../higgs_mass_xsec/functions_
 
 
 # output directory
-outputDir   = f"output2/h{flavour}{flavour}_tagging/histmaker/"
+outputDir   = f"outputMar30/h{flavour}{flavour}_tagging/histmaker/"
 
 
 # define histograms
 
+bins_ml = (50, 0, 1)
 bins_m = (250, 0, 250)
 bins_p = (200, 0, 200)
 bins_m_zoom = (200, 110, 130) # 100 MeV
@@ -314,11 +327,8 @@ def build_graph(df, dataset):
     ### CUT 3: recoil cut (H mass)
     #########
     results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne", "", *bins_m), "zmumu_recoil_m"))
-    #make a histogram that plots what's in zmumu_recoil. make another histogram right after the filter
-    #do that for all cuts
-    #look thru histograms for each cut
-    #make slides: signal before and after each cut (ZH->mumucc)
     df_mumu = df_mumu.Filter("zmumu_recoil_m > 123 && zmumu_recoil_m < 132")
+    results.append(df_mumu.Histo1D(("mumu_recoil_m_nOne_afterFilter", "", *bins_m), "zmumu_recoil_m")) ###########
     results.append(df_mumu.Histo1D(("cutFlow_mumu", "", *bins_count), "cut3"))
     
     results.append(df_ee.Histo1D(("ee_recoil_m_nOne", "", *bins_m), "zee_recoil_m"))
@@ -335,6 +345,7 @@ def build_graph(df, dataset):
     #########
     results.append(df_mumu.Histo1D(("mumu_p_nOne", "", *bins_p), "zmumu_p"))
     df_mumu = df_mumu.Filter("zmumu_p > 45 && zmumu_p < 55")
+    results.append(df_mumu.Histo1D(("mumu_p_nOne_afterFilter", "", *bins_p), "zmumu_p")) ############
     results.append(df_mumu.Histo1D(("cutFlow_mumu", "", *bins_count), "cut4"))
 
     results.append(df_ee.Histo1D(("ee_p_nOne", "", *bins_p), "zee_p"))
@@ -347,6 +358,7 @@ def build_graph(df, dataset):
     #########
     results.append(df_mumu.Histo1D(("zmumu_m_nOne", "", *bins_m), "zmumu_m"))
     df_mumu = df_mumu.Filter("zmumu_m > 85 && zmumu_m < 95")
+    results.append(df_mumu.Histo1D(("zmumu_m_nOne_afterFilter", "", *bins_m), "zmumu_m")) ###########
     results.append(df_mumu.Histo1D(("cutFlow_mumu", "", *bins_count), "cut5"))
 
     results.append(df_ee.Histo1D(("zee_m_nOne", "", *bins_m), "zee_m"))
@@ -389,16 +401,77 @@ def build_graph(df, dataset):
         df = jet2Flavour.inference(weaver_preproc, weaver_model, df) # run inference
         
         # cut on jet confidence
-        #LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOK HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        df = df.Define("Hbb_like", "recojet_isB[0] + recojet_isB[1]")
+        df = df.Define("Hcc_like", "recojet_isC[0] + recojet_isC[1]")
+        df = df.Define("Hss_like", "recojet_isS[0] + recojet_isS[1]")
+
+        df = df.Define("H_best_tag", """
+            if (Hbb_like > Hcc_like && Hbb_like > Hss_like) { return 0; }
+            else if (Hcc_like > Hss_like) { return 1; }
+            else { return 2; }
+        """)
+
+        df = df.Define("charm_prob_0", "recojet_isC[0]")
+        df = df.Define("charm_prob_1", "recojet_isC[1]")
+        df = df.Define("bottom_prob_0", "recojet_isB[0]")
+        df = df.Define("bottom_prob_1", "recojet_isB[1]")
+        df = df.Define("strange_prob_0", "recojet_isS[0]")
+        df = df.Define("strange_prob_1", "recojet_isS[1]")
+
+        #results.append(df.Histo1D(("charm_tag_prob0", "", *bins_prob), "charm_prob_0"))
+        #results.append(df.Histo1D(("charm_tag_prob1", "", *bins_prob), "charm_prob_1"))
+
+
+
         df = df.Filter(f"recojet_is{flavour}[0] > 0.5 && recojet_is{flavour}[1] > 0.5")
+
+
+        #results.append(df.Histo1D(("charm_tag_prob0_after", "", *bins_prob), "charm_prob_0"))
+        #results.append(df.Histo1D(("charm_tag_prob1_after", "", *bins_prob), "charm_prob_1"))
         
         if leps != "neutrinos":
             results.append(df.Histo1D((f"cutFlow_{'mumu' if leps == 'muons' else 'ee'}", "", *bins_count), "cut6"))
             
             # store the final recoil mass of ee and mumu for a fit
-            results.append(df.Histo1D((f"z{leps}_final_recoil_m", "", *bins_m), f"z{'mumu' if leps == 'muons' else 'ee'}_recoil_m"))
+            #results.append(df.Histo1D((f"z{leps}_final_recoil_m", "", *bins_m), f"z{'mumu' if leps == 'muons' else 'ee'}_recoil_m"))
         else:
             results.append(df.Histo1D(("cutFlow_nunu", "", *bins_count), "cut4"))
+
+        # Check orthogonalization before final cut
+        results.append(df.Histo1D((f"Hbb_like_in_Hcc_Z{leps}", "", *bins_prob), "Hbb_like"))
+        results.append(df.Histo1D((f"Hcc_like_in_Hcc_Z{leps}", "", *bins_prob), "Hcc_like"))
+        results.append(df.Histo1D((f"Hss_like_in_Hcc_Z{leps}", "", *bins_prob), "Hss_like"))
+        results.append(df.Histo1D((f"recojet_isB_0_in_Hcc_Z{leps}", "", *bins_prob), "bottom_prob_0"))
+        results.append(df.Histo1D((f"recojet_isC_0_in_Hcc_Z{leps}", "", *bins_prob), "charm_prob_0"))
+        results.append(df.Histo1D((f"recojet_isS_0_in_Hcc_Z{leps}", "", *bins_prob), "strange_prob_0"))
+        results.append(df.Histo1D((f"recojet_isB_1_in_Hcc_Z{leps}", "", *bins_prob), "bottom_prob_1"))
+        results.append(df.Histo1D((f"recojet_isC_1_in_Hcc_Z{leps}", "", *bins_prob), "charm_prob_1"))
+        results.append(df.Histo1D((f"recojet_isS_1_in_Hcc_Z{leps}", "", *bins_prob), "strange_prob_1"))
+        #################
+
+        df = df.Filter("H_best_tag == 1") #Orthog first attempt
+
+        # Check orthogonalization after final cut 
+        results.append(df.Histo1D((f"Hbb_like_in_Hcc_Z{leps}_after", "", *bins_prob), "Hbb_like"))
+        results.append(df.Histo1D((f"Hcc_like_in_Hcc_Z{leps}_after", "", *bins_prob), "Hcc_like"))
+        results.append(df.Histo1D((f"Hss_like_in_Hcc_Z{leps}_after", "", *bins_prob), "Hss_like"))
+        results.append(df.Histo1D((f"recojet_isB_0_in_Hcc_Z{leps}_after", "", *bins_prob), "bottom_prob_0"))
+        results.append(df.Histo1D((f"recojet_isC_0_in_Hcc_Z{leps}_after", "", *bins_prob), "charm_prob_0"))
+        results.append(df.Histo1D((f"recojet_isS_0_in_Hcc_Z{leps}_after", "", *bins_prob), "strange_prob_0"))
+        results.append(df.Histo1D((f"recojet_isB_1_in_Hcc_Z{leps}_after", "", *bins_prob), "bottom_prob_1"))
+        results.append(df.Histo1D((f"recojet_isC_1_in_Hcc_Z{leps}_after", "", *bins_prob), "charm_prob_1"))
+        results.append(df.Histo1D((f"recojet_isS_1_in_Hcc_Z{leps}_after", "", *bins_prob), "strange_prob_1"))
+        ########################
+
+
+        if leps != "neutrinos":
+            results.append(df.Histo1D((f"cutFlow_{'mumu' if leps == 'muons' else 'ee'}", "", *bins_count), "cut7"))
+            
+            # store the final recoil mass of ee and mumu for a fit
+            results.append(df.Histo1D((f"z{leps}_final_recoil_m", "", *bins_m), f"z{'mumu' if leps == 'muons' else 'ee'}_recoil_m"))
+        else:
+            results.append(df.Histo1D(("cutFlow_nunu", "", *bins_count), "cut5"))
+
         
         # store final dijet mass and momentum
         results.append(df.Histo1D((f"z{leps}_h_m", "", *bins_m), "dijet_m"))
@@ -406,11 +479,22 @@ def build_graph(df, dataset):
 
 
 
-    # jet analysis for the case of 2 jets (Z -> leps) --------------
+    #^^ jet analysis for the case of 2 jets (Z -> leps) --------------
 
 
 
-    # Z->qq analyses
+
+
+
+
+
+
+
+
+
+
+
+    # Z->qq analyses (4 jets)
     # clustering
     df_quarks = jet4Cluster.define(df_quarks)
     #df_quarks = df_quarks.Define("jet_tlv", "FCCAnalyses::makeLorentzVectors(jet_px, jet_py, jet_pz, jet_e)")
@@ -458,7 +542,11 @@ def build_graph(df, dataset):
     results.append(df_quarks.Histo1D(("cutFlow_qq", "", *bins_count), "cut2"))
 
     # filter on H mass
+    results.append(df_quarks.Histo1D(("quarks_h_dijet_m_before_cut", "", *bins_m), "h_dijet_m"))
     df_quarks = df_quarks.Filter("h_dijet_m > 122 && h_dijet_m < 128")
+    results.append(df_quarks.Histo1D(("quarks_h_dijet_m_after_cut", "", *bins_m), "h_dijet_m"))
+
+
     results.append(df_quarks.Histo1D(("cutFlow_bb", "", *bins_count), "cut3"))
     results.append(df_quarks.Histo1D(("cutFlow_cc", "", *bins_count), "cut3"))
     results.append(df_quarks.Histo1D(("cutFlow_ss", "", *bins_count), "cut3"))
@@ -484,6 +572,18 @@ def build_graph(df, dataset):
     results.append(df_quarks.Histo1D(("Zcc_prob_nOne", "", *bins_prob), "Zcc_prob"))
     results.append(df_quarks.Histo1D(("Zss_prob_nOne", "", *bins_prob), "Zss_prob"))
     results.append(df_quarks.Histo1D(("Zqq_prob_nOne", "", *bins_prob), "Zqq_prob"))
+
+    #defined up here for h orthogonalization later
+    df_quarks = df_quarks.Define("Hbb_like_q", "recojet_isB[zh_min_idx[2]] + recojet_isB[zh_min_idx[3]]")
+    df_quarks = df_quarks.Define("Hcc_like_q", "recojet_isC[zh_min_idx[2]] + recojet_isC[zh_min_idx[3]]")
+    df_quarks = df_quarks.Define("Hss_like_q", "recojet_isS[zh_min_idx[2]] + recojet_isS[zh_min_idx[3]]")
+    df_quarks = df_quarks.Define("H_best_tag_q", """
+        if (Hbb_like_q > Hcc_like_q && Hbb_like_q > Hss_like_q) { return 0; }
+        else if (Hcc_like_q > Hss_like_q) { return 1; }
+        else { return 2; }                                            
+    """) #possible addition to orthog strategy: change criteria to cosnider other possibilities (isQ or 1-b-c-s)
+    #also consider inverting priority
+    #if b max score is big (>.7 or something), just consider it as hbb
 
     # sort by most likely tag
     df_quarks = df_quarks.Define("Zbb_like", "recojet_isB[zh_min_idx[0]] + recojet_isB[zh_min_idx[1]]")
@@ -518,10 +618,6 @@ def build_graph(df, dataset):
     results.append(df_ss.Graph(f"H{flavour}{flavour}_prob", "Zss_prob"))
     results.append(df_qq.Graph(f"H{flavour}{flavour}_prob", "Zqq_prob"))
 
-    # make sure there are two b (or c or s) jets
-    # switch case based on flavour so that you don't have to change the probabilities each time you change flavour
-    # 16 possibilities
-    # probabilities obtained thru optimization
     df_qq = df_qq.Filter(f"H{flavour}{flavour}_prob > 0.032") #bb: .032
     df_ss = df_ss.Filter(f"H{flavour}{flavour}_prob > 0.032") #bb: .032
     df_cc = df_cc.Filter(f"H{flavour}{flavour}_prob > 0.029") #bb: .029
@@ -533,15 +629,35 @@ def build_graph(df, dataset):
     results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut5"))
 
     # check that the Z jets are the right type
+    results.append(df_bb.Histo1D(("Zbb_prob_before", "", *bins_prob), "Zbb_prob"))
+    results.append(df_cc.Histo1D(("Zcc_prob_before", "", *bins_prob), "Zcc_prob"))
+    results.append(df_ss.Histo1D(("Zss_prob_before", "", *bins_prob), "Zss_prob"))
+    results.append(df_qq.Histo1D(("Zqq_prob_before", "", *bins_prob), "Zqq_prob"))
     df_bb = df_bb.Filter("Zbb_prob > 0.042")
     df_cc = df_cc.Filter("Zcc_prob > 0.134")
     df_ss = df_ss.Filter("Zss_prob > 0.095")
     df_qq = df_qq.Filter("Zqq_prob > 0.053")
+    results.append(df_bb.Histo1D(("Zbb_prob_after", "", *bins_prob), "Zbb_prob"))
+    results.append(df_cc.Histo1D(("Zcc_prob_after", "", *bins_prob), "Zcc_prob"))
+    results.append(df_ss.Histo1D(("Zss_prob_after", "", *bins_prob), "Zss_prob"))
+    results.append(df_qq.Histo1D(("Zqq_prob_after", "", *bins_prob), "Zqq_prob"))
 
     results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut6"))
     results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut6"))
     results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut6"))
     results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut6"))
+
+
+    df_bb = df_bb.Filter("H_best_tag_q == 1") #move orthogonalization after everything else, make it cut7
+    df_cc = df_cc.Filter("H_best_tag_q == 1")
+    df_ss = df_ss.Filter("H_best_tag_q == 1")
+    df_qq = df_qq.Filter("H_best_tag_q == 1")
+
+    results.append(df_bb.Histo1D(("cutFlow_bb", "", *bins_count), "cut7"))
+    results.append(df_cc.Histo1D(("cutFlow_cc", "", *bins_count), "cut7"))
+    results.append(df_ss.Histo1D(("cutFlow_ss", "", *bins_count), "cut7"))
+    results.append(df_qq.Histo1D(("cutFlow_qq", "", *bins_count), "cut7"))
+
 
     # make final mass and momentum histograms
     for q, df in [("bb", df_bb), ("cc", df_cc), ("ss", df_ss), ("qq", df_qq)]:
