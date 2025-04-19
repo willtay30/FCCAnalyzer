@@ -13,29 +13,34 @@ from examples.FCCee.weaver.config import collections, njets
 
 #***************************************************
 # Notice:
-# -Currently only the use of fccanalysis run [] (with proper sourcing) works
-# -Much of the code is commented to allow for further testing, file may not work when uncommented
+# -Use "fccanalysis run h_bb.py" (with proper sourcing - source jsetup.sh) to run file
 # -Code takes a long time to run to completion (>1hr)
 # -Output is stored as seperate root files @ output/hbb_tagging/
+# -Commented code is for adding additional histograms for analysis, not necessary
 #****************************************************
 
 #modifying names 
 
 logger = logging.getLogger("fcclogger")
-runBatch = True
-nCPUS= -1
-# parser = functions.make_def_argparser()
-# args = parser.parse_args()
-# functions.set_threads(args)
 
-# functions.add_include_file("analyses/higgs_mass_xsec/functions.h")
-# functions.add_include_file("analyses/higgs_mass_xsec/functions_gen.h")
+nCPUS= -1 #number of cpus to run, -1 for all available, default is 4
 
-flavour = "B"  # Change to B or C or S as needed
+flavour = "B"  # Change to B or C or S as needed (uppercase), better to use corresponding scripts
 
 # list of all processes
-fraction = 0.005
-processList = {    #Hbb sigs
+fraction = 0.05
+processList = {    
+    #Hss sigs 
+    'wzp6_ee_eeH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_mumuH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_tautauH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_nunuH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_qqH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ssH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_ccH_Hss_ecm240':          {'fraction':fraction},
+    'wzp6_ee_bbH_Hss_ecm240':          {'fraction':fraction},
+
+    #Hbb sigs
     'wzp6_ee_eeH_Hbb_ecm240':          {'fraction':fraction},
     'wzp6_ee_mumuH_Hbb_ecm240':          {'fraction':fraction},
     'wzp6_ee_tautauH_Hbb_ecm240':          {'fraction':fraction},
@@ -86,8 +91,10 @@ processList = {    #Hbb sigs
     'wzp6_gaga_tautau_60_ecm240':          {'fraction':fraction},
     'wzp6_ee_nuenueZ_ecm240':          {'fraction':fraction},
 
+    
 }
 
+#data directories
 inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 procDict = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/samplesDict.json"
 
@@ -96,7 +103,7 @@ includePaths = ["../higgs_mass_xsec/functions.h", "../higgs_mass_xsec/functions_
 
 
 # output directory
-outputDir   = f"outputApril1{flavour}IGiveUp/h{flavour}{flavour}_tagging/histmaker/"
+outputDir   = f"output/h{flavour}{flavour}_tagging/histmaker/"
 
 
 # define histograms
@@ -131,11 +138,6 @@ bins_cosThetaMiss = (10000, 0, 1)
 bins_prob = (400, 0, 2)
 bins_pfcand = (200, -10, 10)
 
-# setup clustering and flavour taggingv helper_jetclustering. helper_flavourtagger.
-# 2 jets
-
-# jet2Cluster = helper_jetclustering.ExclusiveJetClusteringHelper(2, "rps_no_leps")
-# jet2Flavour = helper_flavourtagger.JetFlavourHelper(collections, jet2Cluster.jets, jet2Cluster.constituents)
 
 njets = 2
 jet2Cluster = ExclusiveJetClusteringHelper("rps_no_leps", njets)
@@ -143,17 +145,10 @@ jet2Flavour = JetFlavourHelper(collections, jet2Cluster.jets, jet2Cluster.consti
 
 # 4 jets
 
-# jet4Cluster = helper_jetclustering.ExclusiveJetClusteringHelper(4, "ReconstructedParticles")
-# jet4Flavour = helper_flavourtagger.JetFlavourHelper(collections, jet4Cluster.jets, jet4Cluster.constituents)
 
 njets = 4
 jet4Cluster = ExclusiveJetClusteringHelper("ReconstructedParticles", njets)
 jet4Flavour = JetFlavourHelper(collections, jet4Cluster.jets, jet4Cluster.constituents, "")
-
-# path = "/home/submit/aniketkg/FCCAnalyzer_ag/data/flavourtagger/fccee_flavtagging_edm4hep_wc_v1"
-# urlpath = "https://fccsw.web.cern.ch/fccsw/testsamples/jet_flavour_tagging/winter2023/wc_pt_13_01_2022/fccee_flavtagging_edm4hep_wc_v1"
-# jet2Flavour.load(f"{path}.json", f"{path}.onnx")
-# jet4Flavour.load(f"{path}.json", f"{path}.onnx")
 
 model_name = "fccee_flavtagging_edm4hep_wc_v1"
 
@@ -365,6 +360,8 @@ def build_graph(df, dataset):
     results.append(df_ee.Histo1D(("cutFlow_ee", "", *bins_count), "cut5"))
 
 
+    # jet analysis for the case of 2 jets (Z -> leps) --------------
+
     for leps, df in [("muons", df_mumu), ("electrons", df_ee), ("neutrinos", df_nunu)]:
         # define PF candidates collection by removing the leptons
         if leps != "neutrinos":
@@ -374,7 +371,7 @@ def build_graph(df, dataset):
         
         # clustering
         df = jet2Cluster.define(df)
-        #df = df.Define("jet_tlv", "FCCAnalyses::makeLorentzVectors(jet_px, jet_py, jet_pz, jet_e)")
+        
         df = df.Define("jet_tlv", f"JetConstituentsUtils::compute_tlv_jets({jet2Cluster.jets})")
 
         # calculate dijet m and p
@@ -395,7 +392,6 @@ def build_graph(df, dataset):
         
         # flavour tagging
 
-        #df = jet2Flavour.define_and_inference(df)
         df = jet2Flavour.define(df) # define variables
         df = jet2Flavour.inference(weaver_preproc, weaver_model, df) # run inference
         
@@ -481,7 +477,7 @@ def build_graph(df, dataset):
         results.append(df.Histo1D((f"z{leps}_h_m_END", "", *bins_m), "dijet_m"))
         results.append(df.Histo1D((f"z{leps}_h_p_END", "", *bins_p), "dijet_p"))
 
-    #4/1 adding histograms of kinematic variables
+    #adding histograms of kinematic variables
     results.append(df_mumu.Histo1D(("mumu_recoil_m_END", "", *bins_m), "zmumu_recoil_m"))
     results.append(df_ee.Histo1D(("ee_recoil_m_END", "", *bins_m), "zee_recoil_m"))
 
@@ -492,23 +488,7 @@ def build_graph(df, dataset):
     results.append(df_ee.Histo1D(("zee_m_END", "", *bins_m), "zee_m"))
 
 
-
-    #^^ jet analysis for the case of 2 jets (Z -> leps) --------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Z->qq analyses (4 jets)
+    # Z->qq analyses (4 jets) -------------
     # clustering
     df_quarks = jet4Cluster.define(df_quarks)
     #df_quarks = df_quarks.Define("jet_tlv", "FCCAnalyses::makeLorentzVectors(jet_px, jet_py, jet_pz, jet_e)")
@@ -700,22 +680,3 @@ def build_graph(df, dataset):
     
     return results, weightsum
 
-
-# Main function must be uncommented when running file using python, else keep commented
-
-# if __name__ == "__main__":
-
-#     datadict = functions.get_datadicts() # get default datasets
-
-#     Zprods = ["ee", "mumu", "tautau", "nunu", "qq", "ss", "cc", "bb"] 
-#     bb_sig = [f"wzp6_ee_{i}H_Hbb_ecm240" for i in Zprods]
-#     cc_sig = [f"wzp6_ee_{i}H_Hcc_ecm240" for i in Zprods]
-#     gg_sig = [f"wzp6_ee_{i}H_Hgg_ecm240" for i in Zprods]
-    
-#     quark_test = ["wzp6_ee_qqH_Hbb_ecm240", "wzp6_ee_ssH_Hbb_ecm240", "wzp6_ee_ccH_Hbb_ecm240", "wzp6_ee_bbH_Hbb_ecm240"]
-    
-#     datasets_bkg = ["p8_ee_WW_ecm240", "p8_ee_ZZ_ecm240", "wzp6_ee_mumu_ecm240", "wzp6_ee_tautau_ecm240", "wzp6_egamma_eZ_Zmumu_ecm240", "wzp6_gammae_eZ_Zmumu_ecm240", "wzp6_gaga_mumu_60_ecm240", "wzp6_gaga_tautau_60_ecm240", "wzp6_ee_nuenueZ_ecm240"]
-
-#     datasets_to_run = bb_sig + cc_sig + gg_sig + datasets_bkg[:2]
-    
-#     result = functions.build_and_run(datadict, datasets_to_run, build_graph, f"end_of_h_bb.root", args, norm=True, lumi=7200000)

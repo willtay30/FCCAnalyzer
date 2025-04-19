@@ -1,0 +1,422 @@
+ <<< Combine >>> 
+ <<< v10.1.0 >>>
+>>> Random number generator seed is 123456
+>>> Method used is AsymptoticLimits
+============================================================
+Analyzing bin errors for: prop_binch1
+Poisson cut-off: 0
+Processes excluded for sums: wzp6_ee_mumuH_Hss_ecm240
+============================================================
+Bin        Contents        Error           Notes                         
+0          430.784629      60.337458       total sum                     
+0          428.350752      60.337456       excluding marked processes    
+0          50.000000       7.071068        Unweighted events, alpha=8.615693
+  => Total parameter prop_binch1_bin0[0.00,-7.00,7.00] to be Gaussian constrained
+------------------------------------------------------------
+1          0.000000        0.000000        total sum                     
+1          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+2          0.000000        0.000000        total sum                     
+2          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+3          0.000000        0.000000        total sum                     
+3          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+4          0.000000        0.000000        total sum                     
+4          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+5          0.000000        0.000000        total sum                     
+5          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+6          0.000000        0.000000        total sum                     
+6          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+7          0.000000        0.000000        total sum                     
+7          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+8          0.000000        0.000000        total sum                     
+8          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+9          0.000000        0.000000        total sum                     
+9          0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+10         0.000000        0.000000        total sum                     
+10         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+11         0.000000        0.000000        total sum                     
+11         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+12         0.000000        0.000000        total sum                     
+12         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+13         0.000000        0.000000        total sum                     
+13         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+14         0.000000        0.000000        total sum                     
+14         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+15         0.000000        0.000000        total sum                     
+15         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+16         0.000000        0.000000        total sum                     
+16         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+17         0.000000        0.000000        total sum                     
+17         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+18         0.000000        0.000000        total sum                     
+18         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+19         0.000000        0.000000        total sum                     
+19         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+20         0.000000        0.000000        total sum                     
+20         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+21         0.000000        0.000000        total sum                     
+21         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+22         0.000000        0.000000        total sum                     
+22         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+23         0.000000        0.000000        total sum                     
+23         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+24         0.000000        0.000000        total sum                     
+24         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+25         0.000000        0.000000        total sum                     
+25         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+26         0.000000        0.000000        total sum                     
+26         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+27         0.000000        0.000000        total sum                     
+27         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+28         0.000000        0.000000        total sum                     
+28         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+29         0.000000        0.000000        total sum                     
+29         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+30         0.000000        0.000000        total sum                     
+30         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+31         0.000000        0.000000        total sum                     
+31         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+32         0.000000        0.000000        total sum                     
+32         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+33         0.000000        0.000000        total sum                     
+33         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+34         0.000000        0.000000        total sum                     
+34         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+35         0.000000        0.000000        total sum                     
+35         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+36         0.000000        0.000000        total sum                     
+36         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+37         0.000000        0.000000        total sum                     
+37         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+38         0.000000        0.000000        total sum                     
+38         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+39         0.000000        0.000000        total sum                     
+39         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+40         0.000000        0.000000        total sum                     
+40         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+41         0.000000        0.000000        total sum                     
+41         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+42         0.000000        0.000000        total sum                     
+42         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+43         0.000000        0.000000        total sum                     
+43         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+44         0.000000        0.000000        total sum                     
+44         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+45         0.000000        0.000000        total sum                     
+45         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+46         0.000000        0.000000        total sum                     
+46         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+47         0.000000        0.000000        total sum                     
+47         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+48         0.000000        0.000000        total sum                     
+48         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+49         0.000000        0.000000        total sum                     
+49         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+50         0.000000        0.000000        total sum                     
+50         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+51         0.000000        0.000000        total sum                     
+51         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+52         0.000000        0.000000        total sum                     
+52         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+53         0.000000        0.000000        total sum                     
+53         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+54         0.000000        0.000000        total sum                     
+54         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+55         0.000000        0.000000        total sum                     
+55         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+56         0.000000        0.000000        total sum                     
+56         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+57         0.000000        0.000000        total sum                     
+57         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+58         0.000000        0.000000        total sum                     
+58         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+59         0.000000        0.000000        total sum                     
+59         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+60         0.000000        0.000000        total sum                     
+60         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+61         0.000000        0.000000        total sum                     
+61         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+62         0.000000        0.000000        total sum                     
+62         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+63         0.000000        0.000000        total sum                     
+63         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+64         0.000000        0.000000        total sum                     
+64         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+65         0.000000        0.000000        total sum                     
+65         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+66         0.000000        0.000000        total sum                     
+66         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+67         0.000000        0.000000        total sum                     
+67         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+68         0.000000        0.000000        total sum                     
+68         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+69         0.000000        0.000000        total sum                     
+69         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+70         0.000000        0.000000        total sum                     
+70         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+71         0.000000        0.000000        total sum                     
+71         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+72         0.000000        0.000000        total sum                     
+72         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+73         0.000000        0.000000        total sum                     
+73         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+74         0.000000        0.000000        total sum                     
+74         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+75         0.000000        0.000000        total sum                     
+75         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+76         0.000000        0.000000        total sum                     
+76         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+77         0.000000        0.000000        total sum                     
+77         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+78         0.000000        0.000000        total sum                     
+78         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+79         0.000000        0.000000        total sum                     
+79         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+80         0.000000        0.000000        total sum                     
+80         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+81         0.000000        0.000000        total sum                     
+81         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+82         0.000000        0.000000        total sum                     
+82         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+83         0.000000        0.000000        total sum                     
+83         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+84         0.000000        0.000000        total sum                     
+84         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+85         0.000000        0.000000        total sum                     
+85         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+86         0.000000        0.000000        total sum                     
+86         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+87         0.000000        0.000000        total sum                     
+87         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+88         0.000000        0.000000        total sum                     
+88         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+89         0.000000        0.000000        total sum                     
+89         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+90         0.000000        0.000000        total sum                     
+90         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+91         0.000000        0.000000        total sum                     
+91         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+92         0.000000        0.000000        total sum                     
+92         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+93         0.000000        0.000000        total sum                     
+93         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+94         0.000000        0.000000        total sum                     
+94         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+95         0.000000        0.000000        total sum                     
+95         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+96         0.000000        0.000000        total sum                     
+96         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+97         0.000000        0.000000        total sum                     
+97         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+98         0.000000        0.000000        total sum                     
+98         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+99         0.000000        0.000000        total sum                     
+99         0.000000        0.000000        excluding marked processes    
+  => Error is zero, ignore      
+------------------------------------------------------------
+Channel ch1 will use autoMCStats with settings: event-threshold=0, include-signal=0, hist-mode=1
+
+ -- AsymptoticLimits ( CLs ) --
+Observed Limit: r < 51.4555
+Expected  2.5%: r < 27.9629
+Expected 16.0%: r < 37.1571
+Expected 50.0%: r < 51.5000
+Expected 84.0%: r < 71.6176
+Expected 97.5%: r < 95.1880
+
+Done in 0.00 min (cpu), 0.00 min (real)

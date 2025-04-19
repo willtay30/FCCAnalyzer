@@ -1,194 +1,110 @@
-# FCCAnalyzer
-Analysis framework integrated with the FCC analysis software.
+# Purpose
+Analysis framework integrated with the FCC analysis software.  
 
-This FCCAnalyzer framework relies on class definitions, functions and modules of the main FCC analysis framework, as described here: https://github.com/HEP-FCC/FCCAnalyses. This is necessary to read the official edm4hep Monte Carlo samples and to make use of the latest developments in terms of jet clustering and flavour tagging.
+This FCCAnalyzer framework relies on class definitions, functions and modules of the main FCC analysis framework, as described here: https://github.com/HEP-FCC/FCCAnalyses. This is necessary to read the official edm4hep Monte Carlo samples and to make use of the latest developments in terms of jet clustering and flavour tagging.  
 
-To start using this framework, first fork this repository: https://github.com/jeyserma/FCCAnalyzer. Open a shell and clone this repository:
+This fork was originally meant to adapt the code at https://github.com/jeyserma/FCCAnalyzer to calculate the cross section and 
+cross sectional uncertainty in the HZ decay spectrum, primarily H->bb, H->cc and H->ss. However, that code is now unsupported by 
+the most recent updates to the FCC analysis software (mainly the jet clustering and tagging).  
 
+**As such, only analysis/h_bb directory (and some various files) are being supported, other directories may or may not work!**  
 
-```shell
-git clone git@github.com:<my_git_username>/FCCAnalyzer.git
-cd FCCAnalyzer
-```
-
-To use the FCCAnalyzer, just source the setup bash script (to be done at each fresh shell):
+To run the code here, one must correctly source your environment by running:  
 
 ```shell
-source setup.sh
+source jsetup.sh
 ```
+This allows one to use ROOT, the main frameworking for storing and processing data in this project.  
 
-This framework supports multiple FCC analyses, each analysis contained in its own directory (in the `analyses` directory). A typical analysis consists of a python file containing the logic of the analysis (event selection etc), and one or more header files containing C++ code snippets (for more complicated calculations).
+For more details on how this reposity works/used to work, consult the readme of https://github.com/jeyserma/FCCAnalyzer.  
 
-The analysis structure should be defined in a `build_graph()` function, that can be used in two modes depending on the desired output:
+For more details on the analysis/h_bb directory, condult that directoy's readme.  
 
-- Histogram mode: the output are histograms, runs over all defined processes simultaneously and stored in a single ROOT file. The `build_graph()` should return a list of histograms and the weightsum, in order to properly normalize the histograms.
-- Tree mode (e.g. for training a neural network): the `build_graph()` should return the dataframe and a list of columns to be saved. Currently, the execution of multiple processes is not supported; they need to be handled subsequently.
-
-Examples below make clear the usage of the files and run modes.
-
-
-The underlying `key4hep` stack version (loaded during `setup.sh` is appended to the `stack_history` file. To fix a `key4hep` release, add the path to the setup script to `stack`, and it will be loaded by default.
-
-# Run the analysis using Slurm
-
-If resources on the local machine are limited, the batch system can be used to parallelize your analysis on multiple machines using the Slurm workload manager at SubMIT. As an example, the cross-section analysis is split in about 20 jobs and submitted to the Slurm queue as follows:
-
-```shell
-python analyses/ewk_z/xsec.py --flavor mumu --submit --nJobs 20
-```
-
-By default it writes the intermediate files to `submit/test` (can be changed by invoking `--jobDir`). To check the status of the jobs, do:
-
-```shell
-python analyses/ewk_z/xsec.py --flavor mumu --status
-```
-
-Once all jobs are completed, you have to merge the files into a single ROOT file:
-
-```shell
-python analyses/ewk_z/xsec.py --flavor mumu --merge
-```
-
-The output of the `--merge` command is a ROOT file, as if you ran interactively.
-
-Note: currently supported only for histograms (not yet with Snapshot).
+One should also familiarize themselves with ROOT to understand the processing going on, found here: https://root.cern/manual/.  
 
 # Combine environment
 
-To run fits with Combine, see https://github.com/jeyserma/FCCAnalyzer/tree/main/scripts/combine for instructions on how to install and use Combine.
+Some of the scripts at analysis/h_bb require the use of COMBINE, a CMS statistical analysis tool.  
 
+Information about COMBINE can be found here: https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit  
 
-# Examples
+**Please note that the sourcing for COMBINE and the sourcing for ROOT may conflict with each other!**  
+**Only use the appropriate sourcing for whatever process you are doing!**  
 
-## Forward-Backward asymmetry
-To run the forward-backward asymmetry analysis, run the following script from the main `FCCAnalyzer` directory (to quickly run over a few files, add the option `--maxFiles 50`)
+To get COMBINE, one can follow one of two options:  
 
+## Option 1 - Get the Standalone Version (Recommended)
+
+The recommented method involves cloning your own version of COMBINE in your repository as that method has been tested proven to work.  
+
+The steps are outlined at the COMBINE website: https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/latest/#oustide-of-cmssw-recommended-for-non-cms-users  
+
+This involves cloning the COMBINE directories and using make to setup the environment.
+After which, one can use by using the appropriate sourcing:
 ```shell
-python analyses/ewk_z/afb.py
+cd HiggsAnalysis/CombinedLimit
+source env_standalone.sh
+```
+This must be run in the specified directory in order to work.  
+
+
+## Option 2 - Use Old Method
+
+One may also be able to use COMBINE by following the procedure done previously, as described below. THis method is untested and therefore not recommended.  
+
+To run fits with Combine, see https://github.com/jeyserma/FCCAnalyzer/tree/main/scripts/combine for instructions on how to install and use Combine.  
+
+# Slurm (Work In Progress)
+
+If resources on the local machine are limited, the batch system can be used to parallelize your analysis on multiple machines using the Slurm workload manager at SubMIT.  
+
+Here is a sample SLURM script (.sbatch):
+```shell
+#!/bin/bash
+#SBATCH -J h_ss_job                                       # job name
+#SBATCH -o h_ss_output_%A_%a.txt              # output written to a text file with job number
+#SBATCH -e h_ss_error_%A_%a.txt                # errors written to a text file with job number
+#SBATCH -t 10:00:00                                        # time limit for the job (HH:MM:SS)
+#SBATCH -n 1                                                   # number of tasks
+#SBATCH --cpus-per-task=4                             # number of CPU cores per task
+#SBATCH --mem=64GB                                   # memory allocated per node
+#SBATCH -p submit                                          # partition name (pick between submit and submit-gpu)
+#SBATCH --mail-type=BEGIN,END                  # send an email when done
+#SBATCH --mail-user=isabellalynn622@gmail.com # email address to send confirmation to
+
+# import the sourcing for using fccanalysis and location of the python folder
+source /work/submit/jaeyserm/software/FCCAnalyses/setup.sh
+export PYTHONPATH=$PYTHONPATH:/home/submit/isanford/FCCAnalyzer/
+
+# running the script
+fccanalysis run FCCAnalyzer/analyses/h_bb/h_ss.py
 ```
 
-This produces a ROOT file `afb.root` that contains the histograms. To plot and fit the forward-backward asymmetry, run the following command:
+For you to run it, change the file paths for your desired script to run. This file should be stored in your home directory on submit (eg. /home/submit/<user>). Also edit the email address - it will send an email once the job is complete so you don't have to constantly log in and check.   
 
-```shell
-analyses/ewk_z/scripts/afb_fit.ipynb
-```
+To run, login to submit from your terminal and run the command "sbatch [file name].sbatch". This will run the job on Slurm. Similar to what we've done before, there will be output text files directly viewable so you can see the progress of the script. Some helpful terminal commands:  
 
-Also a standalone script written in ROOT is available to extract the forward-backward asymmetry:
+"sinfo" shows available partitions and their status  
+"squeue" shows all jobs lined up in Slurm  
+"squeue -u $USER" shows which jobes you have running on Slurm  
+"scancel <job number>" will cancel said job  
+"scontrol show job <job number>" will provide information on the current job  
+"top -u $USER" will show live memory allocation (useful to determine if you will run out of memory)  
 
-```shell
-python analyses/ewk_z/scripts/afb_fit.py -o /directory/output/path
-```
+Please note that the job may take longer to run than normal execution and that the job may fail due to using more memory than specified.  
 
-## Simple cross-section at the Z-pole
-To run the forward-backward asymmetry analysis, run the following script from the main:
+SLURM support is currently a work in progress.  
 
-```shell
-python analyses/ewk_z/xsec.py --flavor mumu,ee,qq
-```
+# Acknowledgements
 
-where the flavor is either mumu (dimuon), ee (di-electron) or qq (hadronic) final states. Note that the hadronic final state takes some time to run as the jet clustering is slow. To make basic plots of the Z peak(s), a Jupyter notebook is made available that contains instructions on how to read the histogram file etc:
+Thank to the team behind the FCC analysis software, which is critical to our project.  
 
-```shell
-analyses/ewk_z/scripts/plots_xsec.ipynb
-```
+Special thank you to an Jan Eysermans, Luca Lavezzo and Christoph Paus from MIT. Their advice and support, along with their letting of us
+using MIT computational resources, scripts, and data, made this project possible.  
 
-## BDT training and application using BDT using XGBoost
-To use a BDT in the analysis, first a tree has to be created with all the variables used by the training:
+Thank you to Christopher Palmer for his explanations, guidance and support through development.  
 
-```shell
-python analyses/examples/bdt_xgboost/analysis.py --maketree
-```
+This code adapts much from code developed by Sarah Waldych, Jacob Lee, and Caitlin Kubina. Thank you to them for allowing us to use their 
+code and aiding us in building on it. Their code can be found here: https://github.com/IOKnight/FCCAnalyzer .  
 
-The output are ROOT files, one per process, that contain the events with the calculated columns/branches that are used in the training. Now we'll train the BDT using XGBoost:
-
-
-```shell
-python analyses/examples/bdt_xgboost/train_bdt.py
-```
-
-The output of the training are two files: `bdt_model_example.pkl` and `bdt_model_example.root`. The ROOT file is used to check and evaluate the training performance, over-training etc:
-
-```shell
-python analyses/examples/bdt_xgboost/evaluate_bdt.py -i bdt_model_example.pkl
-```
-
-Then the `bdt_model_example.pkl` is used in the analysis to apply the BDT in the main analysis (it's the same as the first command, except the `maketree` option).
-
-```shell
-python analyses/examples/bdt_xgboost/analysis.py
-```
-
-The output (`test_bdt.root`) are the usual histograms and the histogram `mva` contain the MVA scores, that can be plotted with the following Jupyter notebook:
-
-```shell
-analyses/examples/bdt_xgboost/plots.ipynb
-```
-
-Note: apart from XGBoost, also XML files from TMVA trainings can be read (defined in `analysis.py`)
-
-```shell
-tmva_helper = helper_tmva.TMVAHelperXGB("bdt_model_example.root", "bdt_model") # read the XGBoost training
-tmva_helper = helper_tmva.TMVAHelperXML("TMVAClassification_BDTG.weights.xml") # read an XML file from TMVA
-```
-
-
-## W mass and combinetf fit
-A gen-level W mass analyzer is implemented to extract the uncertainty of the W mass using a likelihood fit. The fit accepts a nominal histogram of the invariant mass of one or both W bosons, and also up/down mass variations that can be obtained using the Breit-Wigner weights. The following analyzer generates all the necessary histograms (only the sample at center-of-mass 163 GeV is to be considered):
-
-```shell
-python analyses/ewk_w/wmass_kinematic.py
-```
-
-The output contains 6 histograms: nominal, +10 MeV and -10 MeV for both W+ and W-. To prepare the fit, we need to convert these histograms to a datacard:
-
-```shell
-mkdir -p combine/wmass_kinematic/
-python analyses/ewk_w/scripts/setup_combine.py
-```
-
-This generates two files: a ROOT file containing the histograms to be fitted and a text datacard that will tell the fitter how to interpret these histograms.
-
-To run the actual lieklihood fit, we use combinetf, which is the Tensorflow-based version of regular combine (a statistical fitting package used by CMS at the LHC). To install combinetf, follow the steps as described here: https://github.com/jeyserma/FCCAnalyzer/tree/main/scripts/combine. After installation, load the environment in a new shell (you cannot use the same terminal/shell as FCCAnalyzer), and execute the following steps to perform the fit:
-
-```shell
-cd combine/wmass_kinematic/
-text2hdf5.py datacard.txt -o datacard.hdf5 --X-allow-no-background --X-allow-no-signal
-combinetf.py datacard.hdf5 -t -1 
-```
-
-The option `-t -1` tells the fitter to fit the W mass to it's nominal value (i.e. to the nominal histogram). The result at the end will show something like this:
-
-```shell
-massShift10MeV = 0.000000 +- 0.061609 (+-99.000000 --99.000000) (massShift10MeV_In = 0.000000)
-```
-
-This means that the mass shift w.r.t. the nominal is 0.0 MeV (as expected as we fit to the nominal mass), but more importantly the uncertainty is 0.061609 per 10 MeV shift, so a total uncertainty of 0.62 MeV or 620 keV. 
-
-
-The exercise above has to be repeated with reconstructed-level ditributions (2 or 4-jet invariant masses), and naturally because of hadronization and detector effects, the mass peaks will be broader and the uncertainty will become larger.
-
-
-## Higgs mass and cross-section at 240 GeV
-To be updated.
-
-
-# Setting up a new analysis
-Each analysis should be contained in its own separate directory, which conventionally should be in the `analyses` directory:
-
-```shell
-mkdir analyses/<my_analysis_name>
-```
-
-Copy over some example files to your directory:
-
-```shell
-cp analyses/ewk_z/afb.py analyses/<my_analysis_name>/analysis.py
-cp analyses/ewk_z/function.h analyses/<my_analysis_name>/functions.h
-```
-
-Edit the python (make sure you update the path to the correct header file) and header files and run it:
-
-```shell
-python analyses/<my_analysis_name>/analysis.py
-```
-
+Contributers: Aniket Gullapalli, Isabella Sanford, William Taylor
