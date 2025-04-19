@@ -35,7 +35,7 @@ To get COMBINE, one can follow one of two options:
 
 ## Option 1 - Get the Standalone Version (Recommended)
 
-The recommented method involves cloning your own version of COMBINE in your repository as that method has been tested proven to work.  
+The recommented method involves cloning your own version of COMBINE in your repository as that method has been tested and proven to work.  
 
 The steps are outlined at the COMBINE website: https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/latest/#oustide-of-cmssw-recommended-for-non-cms-users  
 
